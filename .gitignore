@@ -72,3 +72,7 @@ docs/_build
 
 # Mypy Cache
 .mypy_cache/
+
+# results
+src/chinese_verdict_sheet_nlp/information_extraction/results/checkpoint/*
+src/chinese_verdict_sheet_nlp/information_extraction/results/inference_results/*
