@@ -1,0 +1,6 @@
+-i https://pypi.org/simple
+
+
+click; python_version >= '3.7'
+python-dotenv
+typing-extensions; python_version >= '3.7'

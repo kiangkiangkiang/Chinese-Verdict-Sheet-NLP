@@ -1,0 +1,38 @@
+# This file exists so you can easily regenerate your project.
+#
+# `cookiepatcher` is a convenient shim around `cookiecutter`
+# for regenerating projects (it will generate a .cookiecutterrc
+# automatically for any template). To use it:
+#
+#    pip install cookiepatcher
+#    cookiepatcher gh:ionelmc/cookiecutter-pylibrary Chinese-Verdict-Sheet-NLP
+#
+# See:
+#    https://pypi.org/project/cookiepatcher
+#
+# Alternatively, you can run:
+#
+#    cookiecutter --overwrite-if-exists --config-file=Chinese-Verdict-Sheet-NLP/.cookiecutterrc gh:ionelmc/cookiecutter-pylibrary
+
+default_context:
+    command_line_interface:    'argparse'
+    command_line_interface_bin_name: 'chinese-verdict-sheet-nlp'
+    distribution_name:         'chinese-verdict-sheet-nlp'
+    email:                     'lukajiang@cathayholdings.com.tw'
+    full_name:                 'Luka Jiang'
+    package_name:              'chinese_verdict_sheet_nlp'
+    project_name:              'chinese_verdict_sheet_nlp'
+    project_short_description: 'An example package. Generated with cookiecutter-pylibrary.'
+    release_date:              'today'
+    repo_hosting:              'github.com'
+    repo_hosting_domain:       'github.com'
+    repo_main_branch:          'main'
+    repo_name:                 'Chinese-Verdict-Sheet-NLP'
+    repo_username:             'kiangkiangkiang'
+    sphinx_docs_hosting:       'https://Chinese-Verdict-Sheet-NLP.readthedocs.io/'
+    sphinx_theme:              'sphinx-rtd-theme'
+    use_as:                    'data science'
+    version:                   '0.0.0'
+    website:                   ''
+    year_from:                 '2023'
+    year_to:                   '2023'
