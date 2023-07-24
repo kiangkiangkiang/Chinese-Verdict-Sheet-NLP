@@ -76,3 +76,6 @@ docs/_build
 # results
 src/chinese_verdict_sheet_nlp/information_extraction/results/checkpoint/*
 src/chinese_verdict_sheet_nlp/information_extraction/results/inference_results/*
+
+# log
+.log

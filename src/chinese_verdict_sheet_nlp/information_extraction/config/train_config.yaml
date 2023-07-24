@@ -8,7 +8,7 @@ data_args:
     train_file: "train.txt"
     dev_file: "dev.txt"
     test_file: "test.txt"
-    export_model_dir: None
+    export_model_dir: null
 
 training_args: 
     output_dir: "./models/information_extraction/checkpoint/model_best"
@@ -19,13 +19,13 @@ training_args:
     do_export: True
     per_device_train_batch_size: 8
     per_device_eval_batch_size: 8
-    learning_rate: 1e-5
+    learning_rate: 1e-5 
     weight_decay: 0.0
     adam_beta1: 0.9
     adam_beta2: 0.999
     adam_epsilon: 1e-8
     max_grad_norm: 1.0
-    num_train_epochs: 3.0
+    num_train_epochs: 0.2
     lr_scheduler_type: "linear"
     warmup_ratio: 0.0
     warmup_steps: 0
@@ -33,11 +33,11 @@ training_args:
     save_strategy: "steps"
     save_steps: 200
     eval_steps: 200
-    save_total_limit: None
+    save_total_limit: null
     seed: 11
     device: "gpu"
     disable_tqdm: True
     label_names: ['start_positions', 'end_positions']
     load_best_model_at_end: True
     metric_for_best_model: 'eval_f1'
-    resume_from_checkpoint: None
+    resume_from_checkpoint: null

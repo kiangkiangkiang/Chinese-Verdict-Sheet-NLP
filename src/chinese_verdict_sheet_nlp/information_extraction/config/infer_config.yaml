@@ -1,9 +1,9 @@
 data_args:
-    data_file: "./data/information_extraction/model_infer_data/example.txt"
+    data_file: "./data/information_extraction/model_infer_data/example_for_txt_type_data.txt"
     save_dir: "./reports/information_extraction/inference_results/"
     save_name: "inference_results.txt"
     is_regularize_data: False
-    text_list: None
+    text_list: null
 
 taskflow_args:
     device_id: 0

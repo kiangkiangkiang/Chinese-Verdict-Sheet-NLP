@@ -9,8 +9,8 @@ Why does this file exist, and why __main__? For more info, read:
 - https://docs.python.org/3/using/cmdline.html#cmdoption-m
 """
 
-from .information_extraction import information_extraction_app
-from .text_classification import text_classification_app
+from chinese_verdict_sheet_nlp.information_extraction import information_extraction_app
+from chinese_verdict_sheet_nlp.text_classification import text_classification_app
 import typer
 
 if __name__ == "__main__":

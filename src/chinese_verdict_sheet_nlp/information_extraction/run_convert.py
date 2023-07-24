@@ -67,7 +67,6 @@ def split_labelstudio(
         ValueError: split_ratio 長度不等於 3，若不分割資料可用 [1, 0, 0] 設定。
         ValueError: split_ratio 加總不等於 1。
     """
-    breakpoint()
     logger.info(f"Start converting {os.path.basename(labelstudio_file)} into {save_dir}...")
     set_seed(seed)
 
@@ -125,26 +124,3 @@ def main(config_file: str):
         split_ratio=args["split_ratio"],
         is_shuffle=args["is_shuffle"],
     )
-
-
-"""
-if __name__ == "__main__":
-    parser = PdArgumentParser(ConvertArguments)
-    args = parser.parse_args_into_dataclasses()[0]
-
-    regularized_result = None
-
-    if args.is_regularize_data:
-        regularized_result = regularize_json_file(
-            json_file=args.labelstudio_file, out_variable=True, regularize_text=REGULARIZED_TOKEN
-        )
-
-    split_labelstudio(
-        labelstudio_file=args.labelstudio_file,
-        labelstudio_list=regularized_result,
-        save_dir=args.save_dir,
-        seed=args.seed,
-        split_ratio=args.split_ratio,
-        is_shuffle=args.is_shuffle,
-    )
-"""

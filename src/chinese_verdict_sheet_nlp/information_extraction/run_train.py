@@ -149,6 +149,9 @@ def main(config_file: str):
     training_args = TrainingArguments(**args["training_args"])
     model_args, data_args = args["model_args"], args["data_args"]
 
+    training_args.learning_rate = float(training_args.learning_rate)
+    training_args.adam_epsilon = float(training_args.adam_epsilon)
+
     training_args.print_config(model_args, "Model")
     training_args.print_config(data_args, "Data")
 
@@ -162,24 +165,3 @@ def main(config_file: str):
         export_model_dir=data_args["export_model_dir"],
         training_args=training_args,
     )
-
-
-"""
-if __name__ == "__main__":
-    parser = PdArgumentParser((TrainModelArguments, TrainDataArguments, TrainingArguments))
-    model_args, data_args, training_args = parser.parse_args_into_dataclasses()
-
-    training_args.print_config(model_args, "Model")
-    training_args.print_config(data_args, "Data")
-
-    finetune(
-        dataset_path=data_args.dataset_path,
-        train_file=data_args.train_file,
-        dev_file=data_args.dev_file,
-        test_file=data_args.test_file,
-        max_seq_len=model_args.max_seq_len,
-        model_name_or_path=model_args.model_name_or_path,
-        export_model_dir=data_args.export_model_dir,
-        training_args=training_args,
-    )
-"""

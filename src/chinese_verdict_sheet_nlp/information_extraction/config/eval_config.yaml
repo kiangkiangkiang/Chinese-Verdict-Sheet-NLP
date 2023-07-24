@@ -1,4 +1,6 @@
+model_name_or_path: "./models/information_extraction/checkpoint/model_best"
 dev_file: "./data/information_extraction/model_input_data/test.txt"
 batch_size: 8
 device: "gpu"
 is_eval_by_class: False
+max_seq_len: 768

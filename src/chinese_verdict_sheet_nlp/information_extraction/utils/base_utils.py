@@ -2,6 +2,7 @@ from paddle.static import InputSpec
 from paddlenlp.utils.log import logger
 from paddle import nn
 import yaml
+import os
 
 logger.set_level("INFO")
 
@@ -16,10 +17,11 @@ UIE_INPUT_SPEC = [
     InputSpec(shape=[None, None], dtype="int64", name="attention_mask"),
 ]
 
-REGULARIZED_TOKEN = [r"\n", r" ", r"\u3000", r"\\n"]
+REGULARIZED_TOKEN = ["\n", " ", "\u3000"]
 
 
 def load_config(yaml_file):
     with open(yaml_file, "r") as f:
+        logger.info(f"Loading the config file in {os.path.abspath(f.name)}...")
         data = yaml.load(f, Loader=yaml.Loader)
     return data
