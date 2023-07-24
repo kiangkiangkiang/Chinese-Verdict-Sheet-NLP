@@ -1,6 +1,6 @@
 data_args:
     data_file: "./data/information_extraction/model_infer_data/example.txt"
-    save_dir: "./results/inference_results/"
+    save_dir: "./reports/information_extraction/inference_results/"
     save_name: "inference_results.txt"
     is_regularize_data: False
     text_list: None
@@ -10,8 +10,8 @@ taskflow_args:
     precision: "fp32"
     batch_size: 1
     model: "uie-base"
-    task_path: "./results/checkpoint/model_best"
-    
+    task_path: "./models/information_extraction/checkpoint/model_best"
+
 strategy_args:
     select_strategy: "threshold"
     select_strategy_threshold: 0.5

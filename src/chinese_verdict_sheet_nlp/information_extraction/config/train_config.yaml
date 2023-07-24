@@ -9,9 +9,9 @@ data_args:
     dev_file: "dev.txt"
     test_file: "test.txt"
     export_model_dir: None
-    
+
 training_args: 
-    output_dir: "./results/checkpoint/model_best"
+    output_dir: "./models/information_extraction/checkpoint/model_best"
     overwrite_output_dir: True
     do_train: True
     do_eval: True

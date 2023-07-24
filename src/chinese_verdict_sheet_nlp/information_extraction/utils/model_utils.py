@@ -1,7 +1,6 @@
 from paddle import nn, cast
 from paddlenlp.metrics import SpanEvaluator
-
-loss_function = nn.BCELoss()
+from .base_utils import loss_function
 
 
 def uie_loss_func(outputs, labels):

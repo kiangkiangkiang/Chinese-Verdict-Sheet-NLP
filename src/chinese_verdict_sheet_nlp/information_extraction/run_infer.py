@@ -5,6 +5,7 @@ import os
 import json
 from tqdm import tqdm
 import re
+from datetime import datetime
 
 
 class Processer:
@@ -119,7 +120,7 @@ def inference(
     return postprocess_fun([uie(preprocess_fun(text)) for text in tqdm(text_list)])
 
 
-def main(config_file: str = "infer_config.yaml"):
+def main(config_file: str):
     args = load_config(config_file)
     data_args, taskflow_args, strategy_args = args["data_args"], args["taskflow_args"], args["strategy_args"]
 
@@ -153,6 +154,14 @@ def main(config_file: str = "infer_config.yaml"):
 
     if data_args["save_dir"]:
         out_result = []
+        now = datetime.now().strftime("%m%d_%I%M%S")
+        save_name = data_args["save_name"].split(".")
+
+        if len(save_name) != 2:
+            raise ValueError(f"File name error on {save_name}.")
+
+        save_name = save_name[0] + "_" + now + "." + save_name[1]
+
         if not os.path.exists(data_args["save_dir"]):
             logger.warning(f"{data_args['save_dir']} is not found. Auto-create the dir.")
             os.makedirs(data_args["save_dir"])
@@ -160,7 +169,7 @@ def main(config_file: str = "infer_config.yaml"):
         with open(data_args["data_file"], "r", encoding="utf8") as f:
             text_list = [line.strip() for line in f]
 
-        with open(os.path.join(data_args["save_dir"], data_args["save_name"]), "w", encoding="utf8") as f:
+        with open(os.path.join(data_args["save_dir"], save_name), "w", encoding="utf8") as f:
             for content, result in zip(text_list, inference_result):
                 out_result.append(
                     {

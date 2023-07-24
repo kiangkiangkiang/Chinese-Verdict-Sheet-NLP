@@ -106,7 +106,7 @@ def split_labelstudio(
     logger.info("Finish the convert.")
 
 
-def main(config_file: str = "convert_config.yaml"):
+def main(config_file: str):
 
     args = load_config(config_file)
 

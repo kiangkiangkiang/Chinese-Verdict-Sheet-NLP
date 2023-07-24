@@ -144,7 +144,7 @@ def finetune(
     logger.info("Finish training.")
 
 
-def main(config_file: str = "train_config.yaml"):
+def main(config_file: str):
     args = load_config(config_file)
     training_args = TrainingArguments(**args["training_args"])
     model_args, data_args = args["model_args"], args["data_args"]

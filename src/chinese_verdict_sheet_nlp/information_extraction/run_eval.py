@@ -160,7 +160,7 @@ def evaluate(
         logger.info("Evaluation Precision: %.5f | Recall: %.5f | F1: %.5f" % (precision, recall, f1))
 
 
-def main(config_file: str = "eval_config.yaml"):
+def main(config_file: str):
     args = load_config(config_file)
 
     evaluate(
