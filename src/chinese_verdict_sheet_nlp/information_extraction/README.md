@@ -178,3 +178,14 @@ python run_infer.py \
 - `select_strategy`: 預設`all`，模型推論完後，保留推論結果的策略，`all`表示所有推論結果皆保留。其他可選`max`，表示保留機率最高的推論結果。`threshold`表示推論結果機率值高於`select_strategy_threshold`的結果皆保留。
 - `select_strategy_threshold`: 預設`0.5`，表示當`select_strategy=threshold`時的門檻值。
 - `select_key`: 預設`text start end probability`，表示最終推論保留的值。僅保留文字及機率可設`text probability`。
+
+
+
+#test
+python -m chinese_verdict_sheet_nlp info eval \
+    --model_name_or_path ./results/checkpoint/model_best \
+    --dev_file ./data/model_input_data/test.txt \
+    --device gpu \
+    --is_eval_by_class True \
+    --max_seq_len 768 \
+    --batch_size 8

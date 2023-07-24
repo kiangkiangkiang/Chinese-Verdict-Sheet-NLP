@@ -51,7 +51,8 @@ def read_data_by_chunk(data_path: str, max_seq_len: int = 512) -> Iterator[Dict[
                         or result_list[0]["end"] - result_list[0]["start"] > max_content_len
                     ):
                         raise DataError(
-                            f"Error in result list. Invalid start or end location (start: {result_list[0]['start']}, end: {result_list[0]['end']}). Please check the data in {data_path}."
+                            f"Error in result list. Invalid start or end location (start: {result_list[0]['start']}, "
+                            + "end: {result_list[0]['end']}). Please check the data in {data_path}."
                         )
                     if result_list[0]["start"] < max_content_len:
                         if result_list[0]["end"] > max_content_len:

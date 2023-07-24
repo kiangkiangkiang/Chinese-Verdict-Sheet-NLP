@@ -14,12 +14,21 @@ Why does this file exist, and why not put this in __main__?
 
   Also see (1) from http://click.pocoo.org/5/setuptools/#setuptools-integration
 """
-import argparse
 
-parser = argparse.ArgumentParser(description='Command description.')
-parser.add_argument('names', metavar='NAME', nargs=argparse.ZERO_OR_MORE, help="A name of something.")
+import argparse
+from chinese_verdict_sheet_nlp.information_extraction.run_eval import main as main_eval
+from chinese_verdict_sheet_nlp.information_extraction.run_convert import main as main_convert
+from chinese_verdict_sheet_nlp.information_extraction.run_train import main as main_train
 
 
 def main(args=None):
-    args = parser.parse_args(args=args)
-    print(args.names)
+    parser = argparse.ArgumentParser(description="Command description.")
+    parser.add_argument("clsorie", type=str)
+    parser.add_argument("dowhat", type=str)
+    args = parser.parse_known_args()
+    if args[0].dowhat == "eval":
+        main_eval()
+    if args[0].dowhat == "convert":
+        main_convert()
+    if args[0].dowhat == "train":
+        main_train()

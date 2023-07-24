@@ -1,9 +1,9 @@
-from config.base_config import logger, UIE_INPUT_SPEC, TrainModelArguments, TrainDataArguments
-from utils.data_utils import read_data_by_chunk, convert_to_uie_format
-from utils.model_utils import uie_loss_func, compute_metrics
+from .utils.base_utils import load_config, logger, UIE_INPUT_SPEC
+from .utils.data_utils import read_data_by_chunk, convert_to_uie_format
+from .utils.model_utils import uie_loss_func, compute_metrics
 from paddlenlp.transformers import UIE, AutoTokenizer
-from paddlenlp.trainer import Trainer, get_last_checkpoint, TrainingArguments, PdArgumentParser
-from paddlenlp.trainer.trainer_callback import DefaultFlowCallback, EarlyStoppingCallback
+from paddlenlp.trainer import Trainer, get_last_checkpoint, TrainingArguments
+from paddlenlp.trainer.trainer_callback import DefaultFlowCallback
 from paddlenlp.transformers import export_model
 from paddle import set_device, optimizer
 from typing import Optional, Any, Callable, Dict, Union, Tuple
@@ -144,6 +144,27 @@ def finetune(
     logger.info("Finish training.")
 
 
+def main(config_file: str = "train_config.yaml"):
+    args = load_config(config_file)
+    training_args = TrainingArguments(**args["training_args"])
+    model_args, data_args = args["model_args"], args["data_args"]
+
+    training_args.print_config(model_args, "Model")
+    training_args.print_config(data_args, "Data")
+
+    finetune(
+        dataset_path=data_args["dataset_path"],
+        train_file=data_args["train_file"],
+        dev_file=data_args["dev_file"],
+        test_file=data_args["test_file"],
+        max_seq_len=model_args["max_seq_len"],
+        model_name_or_path=model_args["model_name_or_path"],
+        export_model_dir=data_args["export_model_dir"],
+        training_args=training_args,
+    )
+
+
+"""
 if __name__ == "__main__":
     parser = PdArgumentParser((TrainModelArguments, TrainDataArguments, TrainingArguments))
     model_args, data_args, training_args = parser.parse_args_into_dataclasses()
@@ -161,3 +182,4 @@ if __name__ == "__main__":
         export_model_dir=data_args.export_model_dir,
         training_args=training_args,
     )
+"""

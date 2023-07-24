@@ -1,0 +1,4 @@
+dev_file: "./data/information_extraction/model_input_data/test.txt"
+batch_size: 8
+device: "gpu"
+is_eval_by_class: False

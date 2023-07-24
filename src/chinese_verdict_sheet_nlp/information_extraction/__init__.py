@@ -1,6 +1,6 @@
 import typer
 from typing import Any
-from verdict_analysis.information_extraction.run_eval import main as main_eval
+from chinese_verdict_sheet_nlp.information_extraction.run_eval import main as main_eval
 
 information_extraction_app = typer.Typer()
 

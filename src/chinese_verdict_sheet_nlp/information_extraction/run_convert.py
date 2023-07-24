@@ -1,11 +1,9 @@
-from config.base_config import logger, ENTITY_TYPE, ConvertArguments, REGULARIZED_TOKEN
-from utils.json_utils import convert_format, shuffle_data, set_seed, regularize_json_file
-from paddlenlp.trainer import PdArgumentParser
+from .utils.base_utils import load_config, logger, ENTITY_TYPE, REGULARIZED_TOKEN
+from .utils.json_utils import convert_format, shuffle_data, set_seed, regularize_json_file
 from typing import List, Tuple
 import json
 import os
 from decimal import Decimal
-import typer
 
 
 def do_split(
@@ -90,7 +88,8 @@ def split_labelstudio(
     else:
         if not os.path.exists(labelstudio_file):
             raise ValueError(
-                f"Label studio file not found in {labelstudio_file}. Please input the correct path of label studio file."
+                f"Label studio file not found in {labelstudio_file}. "
+                + "Please input the correct path of label studio file."
             )
 
         with open(labelstudio_file, "r", encoding="utf-8") as infile:
@@ -107,27 +106,28 @@ def split_labelstudio(
     logger.info("Finish the convert.")
 
 
-def main(parser: PdArgumentParser(ConvertArguments)):
-    args = parser.parse_args_into_dataclasses()[0]
+def main(config_file: str = "convert_config.yaml"):
+
+    args = load_config(config_file)
 
     regularized_result = None
 
-    if args.is_regularize_data:
+    if args["is_regularize_data"]:
         regularized_result = regularize_json_file(
-            json_file=args.labelstudio_file, out_variable=True, regularize_text=REGULARIZED_TOKEN
+            json_file=args["labelstudio_file"], out_variable=True, regularize_text=REGULARIZED_TOKEN
         )
-    breakpoint()
 
     split_labelstudio(
-        labelstudio_file=args.labelstudio_file,
+        labelstudio_file=args["labelstudio_file"],
         labelstudio_list=regularized_result,
-        save_dir=args.save_dir,
-        seed=args.seed,
-        split_ratio=args.split_ratio,
-        is_shuffle=args.is_shuffle,
+        save_dir=args["save_dir"],
+        seed=args["seed"],
+        split_ratio=args["split_ratio"],
+        is_shuffle=args["is_shuffle"],
     )
 
 
+"""
 if __name__ == "__main__":
     parser = PdArgumentParser(ConvertArguments)
     args = parser.parse_args_into_dataclasses()[0]
@@ -147,3 +147,4 @@ if __name__ == "__main__":
         split_ratio=args.split_ratio,
         is_shuffle=args.is_shuffle,
     )
+"""

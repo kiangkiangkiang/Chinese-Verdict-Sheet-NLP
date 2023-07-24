@@ -1,18 +1,17 @@
-from verdict_analysis.information_extraction.config.base_config import logger, ENTITY_TYPE, EvaluationArguments
-from functools import partial
-import paddle
-from verdict_analysis.information_extraction.utils.data_utils import (
+from .utils.base_utils import load_config, logger, ENTITY_TYPE
+from .utils.data_utils import (
     read_data_by_chunk,
     convert_to_uie_format,
     create_data_loader,
 )
-from verdict_analysis.information_extraction.utils.exceptions import DataError
+from .utils.exceptions import DataError
+from functools import partial
+import paddle
 import os
 from paddlenlp.data import DataCollatorWithPadding
 from paddlenlp.datasets import load_dataset
 from paddlenlp.metrics import SpanEvaluator
 from paddlenlp.transformers import UIE, AutoTokenizer
-from paddlenlp.trainer import PdArgumentParser
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
@@ -126,7 +125,7 @@ def evaluate(
     batch_size: int = 16,
     is_eval_by_class: bool = False,
 ):
-    breakpoint()
+
     if not os.path.exists(dev_file):
         raise ValueError(f"Data not found in {dev_file}. Please input the correct path of data.")
 
@@ -161,20 +160,20 @@ def evaluate(
         logger.info("Evaluation Precision: %.5f | Recall: %.5f | F1: %.5f" % (precision, recall, f1))
 
 
-def main(parser: PdArgumentParser(EvaluationArguments)):
-    args = parser.parse_args_into_dataclasses()[0]
-    breakpoint()
+def main(config_file: str = "eval_config.yaml"):
+    args = load_config(config_file)
 
     evaluate(
-        model_name_or_path=args.model_name_or_path,
-        dev_file=args.dev_file,
-        batch_size=args.batch_size,
-        device=args.device,
-        is_eval_by_class=args.is_eval_by_class,
-        max_seq_len=args.max_seq_len,
+        model_name_or_path=args["model_name_or_path"],
+        dev_file=args["dev_file"],
+        batch_size=args["batch_size"],
+        device=args["device"],
+        is_eval_by_class=args["is_eval_by_class"],
+        max_seq_len=args["max_seq_len"],
     )
 
 
+"""
 if __name__ == "__main__":
     parser = PdArgumentParser(EvaluationArguments)
     args = parser.parse_args_into_dataclasses()[0]
@@ -187,3 +186,4 @@ if __name__ == "__main__":
         is_eval_by_class=args.is_eval_by_class,
         max_seq_len=args.max_seq_len,
     )
+"""

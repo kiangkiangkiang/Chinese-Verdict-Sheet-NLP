@@ -1,14 +1,6 @@
-from config.base_config import (
-    logger,
-    ENTITY_TYPE,
-    REGULARIZED_TOKEN,
-    InferenceDataArguments,
-    InferenceStrategyArguments,
-    InferenceTaskflowArguments,
-)
+from .utils.base_utils import load_config, logger, ENTITY_TYPE, REGULARIZED_TOKEN
 from typing import List, Callable
 from paddlenlp import Taskflow
-from paddlenlp.trainer import PdArgumentParser
 import os
 import json
 from tqdm import tqdm
@@ -127,6 +119,60 @@ def inference(
     return postprocess_fun([uie(preprocess_fun(text)) for text in tqdm(text_list)])
 
 
+def main(config_file: str = "infer_config.yaml"):
+    args = load_config(config_file)
+    data_args, taskflow_args, strategy_args = args["data_args"], args["taskflow_args"], args["strategy_args"]
+
+    uie_processer = Processer(
+        select_strategy=strategy_args["select_strategy"],
+        threshold=strategy_args["select_strategy_threshold"],
+        select_key=strategy_args["select_key"],
+        is_regularize_data=data_args["is_regularize_data"],
+    )
+
+    logger.info("Start Inference...")
+
+    inference_result = inference(
+        data_file=data_args["data_file"],
+        device_id=taskflow_args["device_id"],
+        schema=ENTITY_TYPE,
+        text_list=data_args["text_list"],
+        precision=taskflow_args["precision"],
+        batch_size=taskflow_args["batch_size"],
+        model=taskflow_args["model"],
+        task_path=taskflow_args["task_path"],
+        postprocess_fun=uie_processer.postprocess,
+        preprocess_fun=uie_processer.preprocess,
+    )
+
+    logger.info("========== Inference Results ==========")
+    for i, text_inference_result in enumerate(inference_result):
+        logger.info(f"========== Content {i} Results ==========")
+        logger.info(text_inference_result)
+    logger.info("End Inference...")
+
+    if data_args["save_dir"]:
+        out_result = []
+        if not os.path.exists(data_args["save_dir"]):
+            logger.warning(f"{data_args['save_dir']} is not found. Auto-create the dir.")
+            os.makedirs(data_args["save_dir"])
+
+        with open(data_args["data_file"], "r", encoding="utf8") as f:
+            text_list = [line.strip() for line in f]
+
+        with open(os.path.join(data_args["save_dir"], data_args["save_name"]), "w", encoding="utf8") as f:
+            for content, result in zip(text_list, inference_result):
+                out_result.append(
+                    {
+                        "Content": content,
+                        "InferenceResults": result,
+                    }
+                )
+            jsonString = json.dumps(out_result, ensure_ascii=False)
+            f.write(jsonString)
+
+
+"""
 if __name__ == "__main__":
     parser = PdArgumentParser((InferenceDataArguments, InferenceStrategyArguments, InferenceTaskflowArguments))
     data_args, strategy_args, taskflow_args = parser.parse_args_into_dataclasses()
@@ -178,3 +224,4 @@ if __name__ == "__main__":
                 )
             jsonString = json.dumps(out_result, ensure_ascii=False)
             f.write(jsonString)
+"""
