@@ -8,7 +8,7 @@ import colorlog
 from tqdm import tqdm
 from typing import List
 
-
+COLUMN_NAME_OF_JSON_CONTENT = "jfull_compress"
 LOGGER_LEVEL = logging.INFO
 LABEL_STUDIO_TEMPLATE = {
     "id": 2162,
@@ -134,7 +134,7 @@ def uie_result_to_labelstudio(
         {
             "id": task_id,
             "data": {
-                "text": uie_result["Content"],
+                "text": uie_result[COLUMN_NAME_OF_JSON_CONTENT],
             },
             "annotations": [
                 {"id": task_id, "task": task_id, "project": 0, "completed_by": {"email": labelstudio_mail}}
@@ -175,7 +175,7 @@ if __name__ == "__main__":
 
     Example:
         python src/chinese_verdict_sheet_nlp/information_extraction/tools/convert_results_to_labelstudio.py \
-            --uie_results_path ./reports/information_extraction/inference_results/inference_results.txt \
+            --uie_results_path ./reports/information_extraction/inference_results/inference_results.json \
             --labelstudio_mail aaa1aaa@gmail.com
 
     Raises:
@@ -201,7 +201,10 @@ if __name__ == "__main__":
 
     label_studio_result = []
     for id, uie_result in tqdm(enumerate(uie_result_list)):
-        logger.debug(f"id: {id}, len(content): {len(uie_result['Content'])}, result: {uie_result['InferenceResults']}.")
+        logger.debug(
+            f"id: {id}, len(content): {len(uie_result[COLUMN_NAME_OF_JSON_CONTENT])}, "
+            + f"result: {uie_result['InferenceResults']}."
+        )
         label_studio_result.append(
             uie_result_to_labelstudio(
                 uie_result=uie_result,

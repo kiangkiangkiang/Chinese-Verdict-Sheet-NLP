@@ -1,4 +1,4 @@
-from .utils.base_utils import load_config, logger, ENTITY_TYPE, REGULARIZED_TOKEN
+from .utils.base_utils import load_config, logger, ENTITY_TYPE, COLUMN_NAME_OF_JSON_CONTENT
 from typing import List, Callable, Tuple
 from paddlenlp import Taskflow
 import os
@@ -22,6 +22,7 @@ class Processer:
         self.threshold = threshold if threshold else 0.5
         self.select_key = select_key if select_key else ["text", "start", "end", "probability"]
         self.is_regularize_data = is_regularize_data
+        self.data = None
 
     def _key_filter(strategy_fun):
         def select_key(self, each_entity_results):
@@ -33,25 +34,26 @@ class Processer:
         return select_key
 
     def preprocess(self, text):
-        return self._do_preprocess(text) if self.is_regularize_data else text
-
-    def postprocess(self, results):
-        new_result = []
-        for result in results:
-            tmp = [{}]
-            for entity in result[0]:
-                tmp[0][entity] = self.select_strategy_fun(result[0][entity])
-            new_result.append(tmp)
-        return new_result
-
-    def _do_preprocess(self, text):
         """
         Override this method if you want to inject some custom behavior
         """
 
-        for re_term in REGULARIZED_TOKEN:
-            text = re.sub(re_term, "", text)
+        if self.is_regularize_data:
+            for re_term in [r"\n", r" ", r"\u3000", r"\\n"]:
+                text = re.sub(re_term, "", text)
         return text
+
+    def postprocess(self, results):
+        """
+        Override this method if you want to inject some custom behavior
+
+        results: [{'精神慰撫金額': [{'text': '30,000元', 'start': 2659, 'end': 2666, 'probability': 0.992}], '醫療費用': [{'text': '4,373元', 'start': 2714, 'end': 2720, 'probability': 0.928}]}]
+        """
+        new_result = [{}]
+        for entity in results[0]:
+            tmp = self.select_strategy_fun(results[0][entity])
+            new_result[0].update({entity: tmp})
+        return new_result
 
     @_key_filter
     def _max_postprocess(self, each_entity_results):
@@ -81,6 +83,7 @@ class Processer:
 def inference(
     data_file: str,
     schema: List[str],
+    data_type: str = "json_type",
     device_id: int = 0,
     text_list: List[str] = None,
     precision: str = "fp32",
@@ -92,6 +95,11 @@ def inference(
 ):
     if not os.path.exists(data_file) and not text_list:
         raise ValueError(f"Data not found in {data_file}. Please input the correct path of data.")
+
+    if data_type not in ["txt_type", "json_type"]:
+        raise ValueError(
+            "data_type args must be 'txt_type' or 'json_type'. See example in ./data/information_extraction/model_infer_data/"
+        )
 
     if task_path:
         if not os.path.exists(task_path):
@@ -115,23 +123,25 @@ def inference(
             device_id=device_id,
         )
 
+    final_results = []
     if not text_list:
-        with open(data_file, "r", encoding="utf8") as f:
-            text_list = [line.strip() for line in f]
+        if data_type == "txt_type":
+            with open(data_file, "r", encoding="utf8") as f:
+                final_results = [{COLUMN_NAME_OF_JSON_CONTENT: line.strip()} for line in f]
+        else:
+            with open(data_file, "r", encoding="utf8") as f:
+                json_list = json.loads(f.read())
+                final_results = [i for i in json_list]
+    else:
+        final_results = [{COLUMN_NAME_OF_JSON_CONTENT: line} for line in text_list]
 
-    return postprocess_fun([uie(preprocess_fun(text)) for text in tqdm(text_list)])
-
-
-def split_content(json_list_path: str) -> Tuple[List[str], List[dict]]:
-    data_with_content = []
-    data_without_content = []
-    with open("./verdict8000.json", "r", encoding="utf8") as f:
-        for i in f:
-            all_content = json.loads(i)
-            for content in all_content:
-                result.append(content.pop("jfull_compress"))
-                result_without_content.append(content)
-    pass
+    for i in tqdm(range(len(final_results))):
+        final_results[i].update(
+            {COLUMN_NAME_OF_JSON_CONTENT: preprocess_fun(final_results[i][COLUMN_NAME_OF_JSON_CONTENT])}
+        )
+        inference_result = postprocess_fun(uie(final_results[i][COLUMN_NAME_OF_JSON_CONTENT]))
+        final_results[i].update({"InferenceResults": inference_result})
+    return final_results
 
 
 def main(config_file: str):
@@ -147,22 +157,12 @@ def main(config_file: str):
 
     logger.info("Start Inference...")
 
-    # TODO add data_type args
-    data_with_only_content = data_args["text_list"]
-    data_without_content = None
-    if data_args["data_type"] == "txt_type":
-        pass
-    elif data_args["data_type"] == "json_type":
-        data_with_only_content, data_without_content = split_content(data_args["data_file"])
-        data_args["data_file"] = None
-    else:
-        raise ValueError(f"Cannot deal with {data_args['data_type']} data type.")
-
     inference_result = inference(
         data_file=data_args["data_file"],
+        data_type=data_args["data_type"],
         device_id=taskflow_args["device_id"],
         schema=ENTITY_TYPE,
-        text_list=data_with_only_content,
+        text_list=data_args["text_list"],
         precision=taskflow_args["precision"],
         batch_size=taskflow_args["batch_size"],
         model=taskflow_args["model"],
@@ -171,17 +171,9 @@ def main(config_file: str):
         preprocess_fun=uie_processer.preprocess,
     )
 
-    # logger.info("========== Inference Results ==========")
-    # for i, text_inference_result in enumerate(inference_result):
-    #     logger.info(f"========== Content {i} Results ==========")
-    #     logger.info(text_inference_result)
-    if data_without_content:
-        for i in 
-        # TODO compose text_inference_result and data_without_content[i]
     logger.info("End Inference...")
 
     if data_args["save_dir"]:
-        out_result = []
         now = datetime.now().strftime("%m%d_%I%M%S")
         save_name = data_args["save_name"].split(".")
 
@@ -194,16 +186,9 @@ def main(config_file: str):
             logger.warning(f"{data_args['save_dir']} is not found. Auto-create the dir.")
             os.makedirs(data_args["save_dir"])
 
-        with open(data_args["data_file"], "r", encoding="utf8") as f:
-            text_list = [line.strip() for line in f]
-
+        logger.info(f"Write the results into {os.path.join(data_args['save_dir'], save_name)}.")
         with open(os.path.join(data_args["save_dir"], save_name), "w", encoding="utf8") as f:
-            for content, result in zip(text_list, inference_result):
-                out_result.append(
-                    {
-                        "Content": content,
-                        "InferenceResults": result,
-                    }
-                )
-            jsonString = json.dumps(out_result, ensure_ascii=False)
+            jsonString = json.dumps(inference_result, ensure_ascii=False)
             f.write(jsonString)
+
+    logger.info("Finish.")

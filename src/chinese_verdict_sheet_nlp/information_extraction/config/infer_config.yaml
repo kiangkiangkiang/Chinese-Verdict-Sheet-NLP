@@ -1,18 +1,20 @@
 data_args:
-    data_file: "./data/information_extraction/model_infer_data/example_for_txt_type_data.txt"
+    data_file: "./data/information_extraction/model_infer_data/example_for_json_type_data.json"
+    data_type: "json_type"
     save_dir: "./reports/information_extraction/inference_results/"
-    save_name: "inference_results.txt"
-    is_regularize_data: False
+    save_name: "inference_results.json"
+    is_regularize_data: True
     text_list: null
 
 taskflow_args:
     device_id: 0
-    precision: "fp32"
+    precision: "fp16"
     batch_size: 1
     model: "uie-base"
-    task_path: "./models/information_extraction/checkpoint/model_best"
+    task_path: "../Chinese-Verdict-NLP/results/checkpoint/model_best"
+    #task_path: "./models/information_extraction/checkpoint/model_best"
 
 strategy_args:
-    select_strategy: "threshold"
+    select_strategy: "max"
     select_strategy_threshold: 0.5
     select_key: ["text", "start", "end", "probability"]

@@ -19,6 +19,8 @@ UIE_INPUT_SPEC = [
 
 REGULARIZED_TOKEN = ["\n", " ", "\u3000"]
 
+COLUMN_NAME_OF_JSON_CONTENT = "jfull_compress"
+
 
 def load_config(yaml_file):
     with open(yaml_file, "r") as f:
