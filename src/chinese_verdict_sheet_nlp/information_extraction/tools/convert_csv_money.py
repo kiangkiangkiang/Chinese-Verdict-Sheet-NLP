@@ -93,7 +93,8 @@ class ArabicNumbersFormatter(object):
             money (str): Mix of Chinese and Arabic numbers
 
         Returns:
-            str: If successfully convert, return the money with Arabic numbers only. Else, return the original input money.
+            str: If successfully convert,
+                return the money with Arabic numbers only. Else, return the original input money.
         """
         try:
             new_money = money + "元" if money[-1] != "元" else money[:]
@@ -126,7 +127,8 @@ class ArabicNumbersFormatter(object):
             money_list (List[str]): List of mix of Chinese and Arabic numbers, like ['一萬五千元', '三千500'].
 
         Returns:
-            List[str]: If successfully convert, return the money with Arabic numbers only. Else, return the original input money.
+            List[str]: If successfully convert,
+                return the money with Arabic numbers only. Else, return the original input money.
         """
 
         regularized_money_list = []
@@ -179,10 +181,9 @@ if __name__ == "__main__":
         os.mkdir(args.save_path)
 
     csv_results = pd.read_csv(args.csv_results_path)
-
     formatter = ArabicNumbersFormatter()
-
     logger.info("Start Converting...")
+
     for each_entity in ENTITY_TYPE:
         logger.info(f"==========Arabic Numbers Converting: {each_entity}==========")
         regularized_money_list = formatter.chinese_to_number(money_list=csv_results.loc[:, each_entity].tolist())

@@ -131,31 +131,24 @@ if __name__ == "__main__":
     parser.add_argument("--save_path", type=str, default="./")
     parser.add_argument("--save_name", type=str, default="uie_result_for_csv.csv")
     args = parser.parse_args()
+
     logger = create_logger(level=LOGGER_LEVEL)
-
     logger.info(f"Read the uie results from {args.uie_results_path}")
-
     uie_inference_results = read_uie_inference_results(path=args.uie_results_path)
-
     logger.info("Start converting the results into csv...")
 
     for i, inference_result in enumerate(uie_inference_results):
         uie_inference_results[i]["InferenceResults"] = uie_result_fill_null_entity(
             uie_result=inference_result["InferenceResults"]
         )
-
         uie_inference_results[i]["InferenceResults"] = uie_result_max_select(
             uie_result=inference_result["InferenceResults"]
         )
-
         uie_inference_results[i]["InferenceResults"] = uie_result_key_remain(
             uie_result=inference_result["InferenceResults"], remain_key_in_csv=REMAIN_KEYS
         )
-
         uie_inference_results[i] = adjust_verdict_to_csv_format(inference_result, remain_key_in_csv=REMAIN_KEYS)
 
     logger.info(f"Write the csv into {os.path.join(args.save_path, args.save_name)}")
-
     write_json_list_to_csv(uie_inference_results, save_path=os.path.join(args.save_path, args.save_name))
-
     logger.info("Finish.")

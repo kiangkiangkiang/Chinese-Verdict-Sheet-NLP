@@ -7,14 +7,15 @@ data_args:
     text_list: null
 
 taskflow_args:
-    device_id: 0
-    precision: "fp16"
+    device_id: -1
+    precision: "fpew"
     batch_size: 1
     model: "uie-base"
-    task_path: "../Chinese-Verdict-NLP/results/checkpoint/model_best"
+    task_path: null
+    #task_path: "../Chinese-Verdict-NLP/results/checkpoint/model_best"
     #task_path: "./models/information_extraction/checkpoint/model_best"
 
 strategy_args:
-    select_strategy: "max"
+    select_strategy: "threshold"
     select_strategy_threshold: 0.5
     select_key: ["text", "start", "end", "probability"]

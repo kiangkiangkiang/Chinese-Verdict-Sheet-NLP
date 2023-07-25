@@ -198,8 +198,8 @@ if __name__ == "__main__":
 
     uie_result_list = read_uie_inference_results(path=args.uie_results_path)
     logger.info("Start converting...")
-
     label_studio_result = []
+
     for id, uie_result in tqdm(enumerate(uie_result_list)):
         logger.debug(
             f"id: {id}, len(content): {len(uie_result[COLUMN_NAME_OF_JSON_CONTENT])}, "
@@ -215,9 +215,7 @@ if __name__ == "__main__":
         )
 
     logger.info(f"Finish converting. Write results to {os.path.join(args.save_path, args.save_name)}")
-
     with open(os.path.join(args.save_path, args.save_name), "w", encoding="utf8") as f:
         tmp = json.dumps(label_studio_result, ensure_ascii=False)
         f.write(tmp)
-
     logger.info("Conversion successful.")
