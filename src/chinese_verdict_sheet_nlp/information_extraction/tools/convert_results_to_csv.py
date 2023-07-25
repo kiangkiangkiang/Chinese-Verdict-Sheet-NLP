@@ -2,15 +2,40 @@ import json
 import csv
 import argparse
 from typing import List
+import logging
+import colorlog
+import sys
+import os
 
 ENTITY_TYPE = ["精神慰撫金額", "醫療費用", "薪資收入"]
 REMAIN_KEYS = ["text"]
 COLUMN_NAME_OF_JSON_CONTENT = "jfull_compress"
+LOGGER_LEVEL = logging.INFO
 KEYS_MAPPING_TO_CSV_TABLE = {
     "start": "uie_result_start_index",
     "end": "uie_result_end_index",
     "probability": "uie_result_probability",
 }
+
+
+def create_logger(level=logging.DEBUG):
+    log_config = {
+        "DEBUG": {"level": 10, "color": "purple"},
+        "INFO": {"level": 20, "color": "green"},
+        "WARNING": {"level": 30, "color": "yellow"},
+        "ERROR": {"level": 40, "color": "red"},
+    }
+    logger = logging.getLogger("convert_to_labelstudio.log")
+    logger.setLevel(level)
+    formatter = colorlog.ColoredFormatter(
+        "%(log_color)s[%(asctime)-15s] [%(levelname)8s]%(reset)s - %(name)s: %(message)s",
+        log_colors={key: conf["color"] for key, conf in log_config.items()},
+    )
+    sh = logging.StreamHandler(sys.stdout)
+    sh.setFormatter(formatter)
+    logger.handlers.clear()
+    logger.addHandler(sh)
+    return logger
 
 
 def read_uie_inference_results(path: str) -> List[dict]:
@@ -82,9 +107,9 @@ def adjust_verdict_to_csv_format(
     return verdict
 
 
-def write_json_list_to_csv(file_list, write_keys=None, save_dir="./verdict8000_uie_inference_result.csv"):
+def write_json_list_to_csv(file_list, write_keys=None, save_path="./uie_result_for_csv.csv"):
     header = write_keys if write_keys else list(file_list[0].keys())
-    with open(save_dir, "w", encoding="utf_8_sig") as f:
+    with open(save_path, "w", encoding="utf_8_sig") as f:
         writer = csv.writer(f)
         writer.writerow(header)
         for file in file_list:
@@ -99,8 +124,6 @@ if __name__ == "__main__":
         python src/chinese_verdict_sheet_nlp/information_extraction/tools/convert_results_to_csv.py \
             --uie_results_path ./reports/information_extraction/inference_results/inference_results.json 
 
-    Raises:
-        ValueError: uie_results_path is not found.
     """
 
     parser = argparse.ArgumentParser()
@@ -108,8 +131,13 @@ if __name__ == "__main__":
     parser.add_argument("--save_path", type=str, default="./")
     parser.add_argument("--save_name", type=str, default="uie_result_for_csv.csv")
     args = parser.parse_args()
+    logger = create_logger(level=LOGGER_LEVEL)
+
+    logger.info(f"Read the uie results from {args.uie_results_path}")
 
     uie_inference_results = read_uie_inference_results(path=args.uie_results_path)
+
+    logger.info("Start converting the results into csv...")
 
     for i, inference_result in enumerate(uie_inference_results):
         uie_inference_results[i]["InferenceResults"] = uie_result_fill_null_entity(
@@ -126,4 +154,8 @@ if __name__ == "__main__":
 
         uie_inference_results[i] = adjust_verdict_to_csv_format(inference_result, remain_key_in_csv=REMAIN_KEYS)
 
-    write_json_list_to_csv(uie_inference_results)
+    logger.info(f"Write the csv into {os.path.join(args.save_path, args.save_name)}")
+
+    write_json_list_to_csv(uie_inference_results, save_path=os.path.join(args.save_path, args.save_name))
+
+    logger.info("Finish.")
