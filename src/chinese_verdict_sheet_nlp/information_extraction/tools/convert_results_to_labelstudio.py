@@ -187,16 +187,16 @@ if __name__ == "__main__":
     parser.add_argument("--save_path", type=str, default="./")
     parser.add_argument("--save_name", type=str, default="uie_result_for_labelstudio.json")
     args = parser.parse_args()
+    logger = create_logger(level=LOGGER_LEVEL)
 
     if not os.path.exists(args.uie_results_path):
         raise ValueError(f"Path not found: {args.uie_results_path}.")
 
     if not os.path.exists(args.save_path):
-        print(f"Path not found: {args.save_path}. Auto-create the path...")
+        logger.info(f"Path not found: {args.save_path}. Auto-create the path...")
         os.mkdir(args.save_path)
 
     uie_result_list = read_uie_inference_results(path=args.uie_results_path)
-    logger = create_logger(level=LOGGER_LEVEL)
     logger.info("Start converting...")
 
     label_studio_result = []

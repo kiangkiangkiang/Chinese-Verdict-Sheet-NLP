@@ -95,19 +95,19 @@ class ArabicNumbersFormatter(object):
         Returns:
             str: If successfully convert, return the money with Arabic numbers only. Else, return the original input money.
         """
-        money = money + "元" if money[-1] != "元" else money
-        found_chinese = re.finditer("[\u4e00-\u9fa5]+", money)
-        last_start = 0
-        final_money = []
         try:
+            new_money = money + "元" if money[-1] != "元" else money[:]
+            found_chinese = re.finditer("[\u4e00-\u9fa5]+", new_money)
+            last_start = 0
+            final_money = []
             for each_found in found_chinese:
                 start, end = each_found.span()
                 number = []
                 for index in range(last_start, start):
-                    number.append(money[index])
+                    number.append(new_money[index])
                 number = cn2an.an2cn("".join(number)) if number[0] != "0" else "零" + cn2an.an2cn("".join(number))
                 for index in range(start, end):
-                    number += money[index]
+                    number += new_money[index]
                 final_money.append(number)
                 last_start = end
             final_money[-1] = self.__add_zero_for_missing_unit(final_money[-1])
@@ -141,8 +141,11 @@ class ArabicNumbersFormatter(object):
                 if regularized_money == money:
                     fail_cases.append(money)
                     if not remain_outlier:
-                        regularized_money = outlier_representation
-            regularized_money_list.append(regularized_money)
+                        regularized_money = outlier_representation[:]
+                regularized_money_list.append(regularized_money)
+            else:
+                regularized_money_list.append("nan")
+
         if fail_cases:
             logger.error(f"Fail Cases: {fail_cases}")
             if not remain_outlier:
@@ -153,12 +156,19 @@ class ArabicNumbersFormatter(object):
         return regularized_money_list
 
 
-# python regularize_money_from_csv_results.py --csv_results_path ./verdict8000_uie_inference_result.csv
 if __name__ == "__main__":
+    """將「convert_results_to_csv.py」產生的 csv 結果內的金額轉成阿拉伯數字。
+
+    Example:
+        python src/chinese_verdict_sheet_nlp/information_extraction/tools/convert_csv_money.py \
+            --csv_results_path ./uie_result_for_csv.csv
+
+    """
+
     parser = argparse.ArgumentParser()
     parser.add_argument("--csv_results_path", type=str)
     parser.add_argument("--save_path", type=str, default="./")
-    parser.add_argument("--save_name", type=str, default="regularized_result.csv")
+    parser.add_argument("--save_name", type=str, default="uie_result_for_csv_with_correct_money.csv")
     args = parser.parse_args()
 
     if not os.path.exists(args.csv_results_path):
