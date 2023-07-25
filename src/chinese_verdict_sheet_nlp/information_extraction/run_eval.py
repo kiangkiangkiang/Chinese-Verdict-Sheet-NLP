@@ -171,19 +171,3 @@ def main(config_file: str):
         is_eval_by_class=args["is_eval_by_class"],
         max_seq_len=args["max_seq_len"],
     )
-
-
-"""
-if __name__ == "__main__":
-    parser = PdArgumentParser(EvaluationArguments)
-    args = parser.parse_args_into_dataclasses()[0]
-
-    evaluate(
-        model_name_or_path=args.model_name_or_path,
-        dev_file=args.dev_file,
-        batch_size=args.batch_size,
-        device=args.device,
-        is_eval_by_class=args.is_eval_by_class,
-        max_seq_len=args.max_seq_len,
-    )
-"""

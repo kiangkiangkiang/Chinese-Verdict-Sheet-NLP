@@ -16,6 +16,6 @@ taskflow_args:
     #task_path: "./models/information_extraction/checkpoint/model_best"
 
 strategy_args:
-    select_strategy: "threshold"
+    select_strategy: "all"
     select_strategy_threshold: 0.5
     select_key: ["text", "start", "end", "probability"]
